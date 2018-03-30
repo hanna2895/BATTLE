@@ -18,4 +18,6 @@ ctx.fillText('BATTLE', x, y - 100);
 // button to start the game
 $('#start').on('click', () => {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	$('canvas').addClass('ocean')
+	$('#start').detach();
 })

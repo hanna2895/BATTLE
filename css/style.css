@@ -3,10 +3,27 @@ body {
 	display: flex;
 	flex-direction: column;
 }
-
-canvas {
+.container {
+	display: flex;
+	flex-direction: row;
 	border: 2px solid blue;
-	margin-left: auto;
-	margin-right: auto;
+	width: 1005px;
 }
 
+canvas {
+	
+	box-sizing: border-box;
+/*	margin-left: auto;
+	margin-right: auto;*/
+}
+
+.stats {
+	width: 200px;
+	height: 800px;
+	background-color: brown;
+	margin-right: 2px;
+}
+
+.ocean {
+	background: url(../img/Ocean.jpeg);
+}
