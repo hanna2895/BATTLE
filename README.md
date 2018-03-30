@@ -18,3 +18,5 @@ Once the user defeats all of the small ships, they will go to the final level an
 If the user runs out of hull points before defeating all of the alien ships, the game is over and the user is taken to the game over screen. 
 
 The user will have the option to click start over to reset the game. 
+
+Levels: ocean, desert, arctic, city, space
