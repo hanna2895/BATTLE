@@ -170,6 +170,17 @@ class Shot {
 	
 }
 
+// collision detection utility function
+function getDistance(x1, y1, x2, y2) {
+	let xDistance = x2 - x1;
+	let yDistance = y2 - y1;
+
+	return Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
+}
+
+
+
+
 function gamePlayAnimation (e) {
 	const key = e.keyCode;
 
@@ -216,14 +227,19 @@ function gamePlayAnimation (e) {
 
 			// change the shot's position
 			shot.y -= 1;
-		}
-		// store the shot's previous position in an array to make a motion trail
 
+			console.log(getDistance(shot.x, shot.y, alienShipFactory.alienShips[0].body.x, alienShipFactory.alienShips[0].body.y));
+
+			// collision detection
+			if (getDistance(shot.x, shot.y, alienShipFactory.alienShips[0].body.x, alienShipFactory.alienShips[0].body.y) < alienShipFactory.alienShips[0].body.r + shot.r) {
+				console.log("You hit the alien ship.");
+			}
+		}
 
 		// also draw the spaceship
 		spaceship.drawBody();
+		// also draw the aliens
 		alienShipFactory.animateAliens();
-		console.log("shots fired");
 	}
 }
 
