@@ -122,6 +122,11 @@ const alienShipFactory = {
 		this.alienShips.push(newAlienShip);
 		newAlienShip.drawBody();
 		return newAlienShip;
+	},
+	animateAliens() {
+		for (let i = 0; i < this.alienShips.length; i++) {
+			this.alienShips[i].drawBody();
+		}
 	}
 }
 
@@ -175,12 +180,14 @@ function gamePlayAnimation (e) {
 		spaceship.body.x = spaceship.body.x + speed;
 		spaceship.move();
 		spaceship.drawBody();
+		alienShipFactory.animateAliens();
 	} else if (key === 37) {
 		ctx.clearRect(0,0, canvas.width, canvas.height);
 		spaceship.direction = 'left';
 		spaceship.body.x = spaceship.body.x - speed;
 		spaceship.move();
 		spaceship.drawBody();
+		alienShipFactory.animateAliens();
 	} else if (key === 32) {
 		requestAnimationFrame(gamePlayAnimation)
 		
@@ -215,6 +222,7 @@ function gamePlayAnimation (e) {
 
 		// also draw the spaceship
 		spaceship.drawBody();
+		alienShipFactory.animateAliens();
 		console.log("shots fired");
 	}
 }
