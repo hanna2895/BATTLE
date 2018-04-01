@@ -21,6 +21,7 @@ $('#start').on('click', () => {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	$('canvas').addClass('ocean')
 	$('#start').detach();
+	theGame.startGame();
 	spaceship.initialize()
 	spaceship.drawBody()
 })
@@ -50,7 +51,9 @@ const theGame = {
 			console.log("alienShipXPos = " + alienShipXPos);
 
 		}
-		console.log(alienShipFactory.alienShips);
+
+		$('#level').text("LEVEL ONE")
+		$('#ships-remaining').text("Alien Ships Remaining: " + alienShipFactory.alienShips.length)
 
 	}
 }
@@ -89,8 +92,6 @@ const spaceship = {
 		ctx.fill();
 		ctx.closePath();
 	}
-
-
 }
 
 
@@ -162,7 +163,7 @@ class Shot {
 				x: this.x,
 				y: this.y
 			});
-			if (this.positions.length > 10) { // 10 is the length of the motion trail. hardcoding because I won't need it to change
+			if (this.positions.length > 100) { // 10 is the length of the motion trail. hardcoding because I won't need it to change
 				this.positions.shift();
 			}
 		}	
@@ -206,7 +207,7 @@ function gamePlayAnimation (e) {
 		const shot = new Shot(spaceship.body.x, spaceship.body.y);
 
 		// move the shot
-		for (let i = spaceship.body.y; i > 100; i -= 1) {
+		for (let i = spaceship.body.y; i > -100; i -= 1) { 
 			ctx.clearRect(0,0, canvas.width, canvas.height);
 			
 			// draw the motion trail 
@@ -228,18 +229,30 @@ function gamePlayAnimation (e) {
 			// change the shot's position
 			shot.y -= 1;
 
-			console.log(getDistance(shot.x, shot.y, alienShipFactory.alienShips[0].body.x, alienShipFactory.alienShips[0].body.y));
-
 			// collision detection
-			if (getDistance(shot.x, shot.y, alienShipFactory.alienShips[0].body.x, alienShipFactory.alienShips[0].body.y) < alienShipFactory.alienShips[0].body.r + shot.r) {
-				console.log("You hit the alien ship.");
+			for (let k = 0; k < alienShipFactory.alienShips.length; k++) {
+				
+			 	if (getDistance(shot.x, shot.y, alienShipFactory.alienShips[k].body.x, alienShipFactory.alienShips[k].body.y) < alienShipFactory.alienShips[k].body.r + shot.r) {
+					console.log("You hit the alien ship.");
+					// remove that alien ship from the array
+					alienShipFactory.alienShips.splice(k,1);
+					$('#ships-remaining').text("Alien Ships Remaining: " + alienShipFactory.alienShips.length)
+				if (alienShipFactory.alienShips.length === 0) {
+					console.log("You have destroyed all of the alien ships. Click continue to move on to the next level.");
+					cancelAnimationFrame(gamePlayAnimation)
+
+				// get the sho to stop moving
+				}
+				
 			}
+			
 		}
 
 		// also draw the spaceship
 		spaceship.drawBody();
 		// also draw the aliens
 		alienShipFactory.animateAliens();
+	}	
 	}
 }
 
