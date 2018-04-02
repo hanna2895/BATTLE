@@ -5,12 +5,9 @@
 
 // make the animations sprites / images instead of dots 
 
-// style the landing page / other game text
-
 // make a modal for when you hit or destroy an alien ship
 
 // make an instructions page that the user can click on the landing page
-// figure out how to put the buttons in the right place
 
 const canvas = document.getElementById('my-canvas');
 
@@ -72,8 +69,8 @@ const theGame = {
 		}
 
 		$('#level').text("LEVEL ONE")
-		$('#ships-destroyed').text("Alien Ships Destroyed: " + this.shipsDestroyed.length)
-		$('#ships-remaining').text("Alien Ships Remaining: " + alienShipFactory.alienShips.length)
+		$('#ships-destroyed').text("Ships Destroyed: " + this.shipsDestroyed.length)
+		$('#ships-remaining').text("Ships Remaining: " + alienShipFactory.alienShips.length)
 	},
 	shipsDestroyed: []
 }
@@ -309,11 +306,25 @@ function gamePlayAnimation (e) {
 	}
 }
 
+// MODAL STUFF
 
+const modal = $('.modal');
+
+const toggleModal = () => {
+    modal.toggleClass("show-modal")
+    modal.on('click', toggleModal);
+}
+
+// EVENT LISTENERS
 
 $('html').keydown(function(e) {
 	gamePlayAnimation(e);
 	})
 
+$('#instructions').on('click', () => {
+	// $('.modal-content').text(""
+	toggleModal();
+});
+$('.close-button').on('click', toggleModal)
 
 
