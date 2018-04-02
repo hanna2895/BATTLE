@@ -5,7 +5,7 @@ Player must fight to defend the earth from invading aliens.
 
 The game opens to the start page. The player has the option to click instructions to see how to play. The player will click start to begin the game. 
 
-The player will be able to move the ship back and forth and shoot at approaching alien ships. Alien ships will slowly move forward and shoot back at the player's ship. 
+The player will be able to move the ship back and forth and shoot at approaching alien ships. Alien ships will shoot back at the player's ship. 
 
 The player must be able to view their own ship's statistics in the panel. They can also see the enemy / target ship's statistics. 
 

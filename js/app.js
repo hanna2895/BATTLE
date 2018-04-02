@@ -7,25 +7,13 @@
 
 // make a modal for when you hit or destroy an alien ship
 
-// make an instructions page that the user can click on the landing page
-
 const canvas = document.getElementById('my-canvas');
 
 const ctx = canvas.getContext('2d');
 
-// to center stuff on the canvas
-
-
+// some global variables
 const speed = 20;
 let handle;
-
-// make the Battle text on the home screen
-// ctx.beginPath();
-// ctx.font = "bold 40px 'Righteous'";
-// // font-family: 'Righteous', cursive;
-// ctx.textAlign ='center';
-// ctx.fillStyle = 'blue';
-// ctx.fillText('BATTLE', cx, cy - 100);
 
 // button to start the game
 $('#start').on('click', () => {
@@ -43,9 +31,6 @@ $('#start').on('click', () => {
 	spaceship.drawBody()
 })
 
-// const cx = canvas.width / 2;
-// const cy = canvas.height / 2;
-
 const getRandomInteger = (min, max) => {
 	min = Math.floor(min);
 	max = Math.ceil(max);
@@ -55,17 +40,20 @@ const getRandomInteger = (min, max) => {
 // the game object
 
 const theGame = {
+	numOfAliens: 0,
 	startGame() {
-		let numOfAliens = getRandomInteger(5, 11)
+		this.numOfAliens = getRandomInteger(5, 11)
 		alienShipFactory.alienShips = [];
 
-		const alienShipX = ((canvas.width - 100) / numOfAliens)
+		const alienShipX = ((canvas.width - 100) / this.numOfAliens)
 		let alienShipXPos = alienShipX;
 
-		for (let i = 1; i <= numOfAliens; i++) {
-			alienShipFactory.generateAlienShips(alienShipXPos);
+		for (let i = 1; i <= this.numOfAliens; i++) {
+			alienShipFactory.generateAlienShips(alienShipXPos, i);
 
 			alienShipXPos += alienShipX
+			// alienShipFactory.alienShips[i].shipId = (i + 1)
+			console.log(alienShipFactory.alienShips);
 		}
 
 		$('#level').text("LEVEL ONE")
@@ -75,11 +63,12 @@ const theGame = {
 	shipsDestroyed: []
 }
 
-// make a ship class
+// make a ship
 const spaceship = {
 	body: {},
 	direction: "right",
 	firepower: 2,
+	hull: 100,
 	initialize () {
 		this.body = {
 			x: 400,
@@ -137,7 +126,7 @@ class AlienShip {
 const alienShipFactory = {
 	alienShips: [],
 	generateAlienShips(xPos) {
-		const newAlienShip = new AlienShip(this.alienShips.length, xPos);
+		const newAlienShip = new AlienShip((this.alienShips.length + 1), xPos);
 		this.alienShips.push(newAlienShip);
 		newAlienShip.drawBody();
 		return newAlienShip;
@@ -198,11 +187,70 @@ function getDistance(x1, y1, x2, y2) {
 }
 
 
+function alienFire() {
+	const randomAlienShip = alienShipFactory.alienShips[Math.floor(Math.random()*alienShipFactory.alienShips.length)]
+	const alienShot = new Shot(randomAlienShip.body.x, randomAlienShip.body.y);
+	let wereYouHit = false;
 
+	if (alienShipFactory.alienShips.length === 0) {
+		// DO NOTHING
+		return;
+	} else {
+		for (let i = randomAlienShip.body.y; i < 700; i += 1) { 
+			ctx.clearRect(0,0, canvas.width, canvas.height);
+	
+		// draw the motion trail 
+		for (let j = 0; j < alienShot.positions.length; j++) {
+			const ratio = (i + 150) / alienShot.positions.length
+			ctx.beginPath();
+			ctx.arc(alienShot.positions[j].x, alienShot.positions[j].y, 10, 0, 2*Math.PI, true);
+			ctx.fillStyle ='rgba(204, 102, 153, ' + ratio / 2 + ")";
+			ctx.fill();
+		}
+	
+		// redraw the shot on the canvas
+		alienShot.draw()
+		// store where the shot is for motion trail
+		alienShot.storeLastPosition(alienShot.x, alienShot.y)
+		// change the shot's position
+		alienShot.y += 1;
+
+	}
+	// check for collision
+	
+	if (wereYouHit === false) {
+		if (getDistance(alienShot.x, alienShot.y, spaceship.body.x, spaceship.body.y) < spaceship.body.r + alienShot.r) {
+			// cancelAnimationFrame(gamePlayAnimation)
+			console.log("The alien lasers hit your ship.");
+			spaceship.hull -= 1;
+			$('#player-stats').text("Hull points: " + spaceship.hull)
+			wereYouHit = true;
+		}
+	} else {
+		if (spaceship.hull <= 0) {
+			console.log("The aliens have destroyed your ship. game over.");
+			return;
+		}
+	}
+	
+	// also draw the spaceship
+	spaceship.drawBody();
+	// also draw the aliens
+	alienShipFactory.animateAliens();
+}
+}
 
 
 function gamePlayAnimation (e) {
 	const key = e.keyCode;
+
+	if (alienShipFactory.alienShips.length < 1) {
+		cancelAnimationFrame(gamePlayAnimation)
+		return;
+	} else if (alienShipFactory.alienShips.length > 0) {
+		window.setInterval(alienFire, 1000)
+	} 
+	
 
 	if (key === 39) {
 		ctx.clearRect(0,0, canvas.width, canvas.height);
@@ -225,6 +273,7 @@ function gamePlayAnimation (e) {
 		const shot = new Shot(spaceship.body.x, spaceship.body.y);
 		let didYouHit = false;
 
+		//function to check if the shot hit the alien ship
 		const checkForCollision = () => {
 			for (k = 0; k < alienShipFactory.alienShips.length; k++) {
 						
@@ -243,11 +292,12 @@ function gamePlayAnimation (e) {
 			}
 		}
 
+		// function to check if the shot destroyed the alien ship
 		const checkForDestruction = (k) => {
 			if (typeof(k) != "number") {
 				console.log("nothing happened because you didn't hit the ship.");
 			} else {
-				console.log(alienShipFactory.alienShips[k]);
+				// console.log(alienShipFactory.alienShips[k]);
 				alienShipFactory.alienShips[k].hull -= spaceship.firepower;
 			
 
@@ -258,7 +308,7 @@ function gamePlayAnimation (e) {
 					$('#ships-remaining').text("Alien Ships Remaining: " + alienShipFactory.alienShips.length)
 					// add it to ships destroyed array to track how many have been destroyed
 					$('#ships-destroyed').text("Alien Ships Destroyed: " + theGame.shipsDestroyed.length)
-					console.log('ship destroyed');
+					// toggleModal2();
 					return true;
 				} else {
 					return;
@@ -300,10 +350,8 @@ function gamePlayAnimation (e) {
 			spaceship.drawBody();
 			// also draw the aliens
 			alienShipFactory.animateAliens();
-
-			
 		}	
-	}
+	} 
 }
 
 // MODAL STUFF
@@ -314,6 +362,20 @@ const toggleModal = () => {
     modal.toggleClass("show-modal")
     modal.on('click', toggleModal);
 }
+
+// const modal2 = $('.modal2');
+
+// const toggleModal2 = () => {
+// 	modal2.toggleClass("show-modal")
+// 	modal2.on('keypress', toggleModal2)
+
+// 	// keypress(function() {
+// 	// 	console.log("keypress registerd");
+// 	//  toggleModal2()	
+// 	// })
+// 	// modal2.on('click', toggleModal2)
+	
+// }
 
 // EVENT LISTENERS
 
@@ -326,5 +388,3 @@ $('#instructions').on('click', () => {
 	toggleModal();
 });
 $('.close-button').on('click', toggleModal)
-
-
