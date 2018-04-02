@@ -10,12 +10,50 @@ body {
 	width: 1005px;
 }
 
+#canvas-holder {
+	width: 800px;
+}
+
+#intro-screen{
+	font-family: 'Righteous';
+	color: blue;
+	display: flex;
+	height: 600px;
+	flex-direction: column;
+	justify-content: space-around;
+}
+
+#title {
+	padding-top: 150px;
+	font-size: 180px;
+	margin-left: auto;
+	margin-right: auto;
+	letter-spacing: .9rem;
+}
+
+#control-panel{
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+}
+
+.buttons {
+	background-color: blue;
+	color: black;
+	font-size: 50px;
+	margin-right: auto;
+	margin-left: auto;
+	padding: 5px;
+
+}
+
 canvas {
 	
 	box-sizing: border-box;
 /*	margin-left: auto;
 	margin-right: auto;*/
 }
+
 
 .stats {
 	width: 200px;
@@ -27,4 +65,12 @@ canvas {
 .ocean {
 	background: url(../img/OceanAnim.png);
 	background-size: cover;
+}
+
+#preloadfont {
+  font-family: 'Righteous';
+  opacity:0;
+  height:0;
+  width:0;
+  display:inline-block;
 }

@@ -1,7 +1,5 @@
 // STILL TO DO
 
-// give aliens hp / make them more difficult to kill
-
 // give ship hp 
 // make it so that random alien ships can shoot back at random intervals
 
@@ -9,7 +7,7 @@
 
 // style the landing page / other game text
 
-// make a modal for when you hit an alien ship
+// make a modal for when you hit or destroy an alien ship
 
 // make an instructions page that the user can click on the landing page
 // figure out how to put the buttons in the right place
@@ -19,28 +17,37 @@ const canvas = document.getElementById('my-canvas');
 const ctx = canvas.getContext('2d');
 
 // to center stuff on the canvas
-const cx = canvas.width / 2;
-const cy = canvas.height / 2;
+
 
 const speed = 20;
 let handle;
 
 // make the Battle text on the home screen
-ctx.beginPath();
-ctx.font = '48px serif';
-ctx.textAlign ='center';
-ctx.fillStyle = 'blue';
-ctx.fillText('BATTLE', cx, cy - 100);
+// ctx.beginPath();
+// ctx.font = "bold 40px 'Righteous'";
+// // font-family: 'Righteous', cursive;
+// ctx.textAlign ='center';
+// ctx.fillStyle = 'blue';
+// ctx.fillText('BATTLE', cx, cy - 100);
 
 // button to start the game
 $('#start').on('click', () => {
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	// ctx.clearRect(0, 0, canvas.width, canvas.height);
+	$('#intro-screen').detach();
+	// $('#canvas-holder').append($('<canvas>'))
+	// $('canvas').attr('id','my-canvas')
+	$('canvas').attr('width', '800px');
+	$('canvas').attr('height', '800px');
+
 	$('canvas').addClass('ocean')
 	$('#start').detach();
 	theGame.startGame();
 	spaceship.initialize()
 	spaceship.drawBody()
 })
+
+// const cx = canvas.width / 2;
+// const cy = canvas.height / 2;
 
 const getRandomInteger = (min, max) => {
 	min = Math.floor(min);
@@ -291,36 +298,11 @@ function gamePlayAnimation (e) {
 				console.log("You destroyed the alien ship.");
 				};
 			}
-			
-			// for (let k = 0; k < alienShipFactory.alienShips.length; k++) {
-				
-			//  	if (alienShipFactory.alienShips.length === 0) {
-			// 		console.log("You have destroyed all of the alien ships. Click continue to move on to the next level.");
-			// 		spaceship.drawBody();
-			// 	}
 
-			//  	if (getDistance(shot.x, shot.y, alienShipFactory.alienShips[k].body.x, alienShipFactory.alienShips[k].body.y) < alienShipFactory.alienShips[k].body.r + shot.r) {
-			// 		cancelAnimationFrame(gamePlayAnimation)
-
-			// 		console.log("You hit the alien ship.");
-			// 		// push that one into the ships destroyed array
-			// 		if (checkForDestruction(k) === true) {
-			// 			// also draw the spaceship
-			// 			spaceship.drawBody();
-			// 			// also draw the aliens
-			// 			alienShipFactory.animateAliens();
-			// 			return;
-					
-			// 		}
-
-
-			// 	}
-
-			// }
-				// also draw the spaceship
-				spaceship.drawBody();
-				// also draw the aliens
-				alienShipFactory.animateAliens();
+			// also draw the spaceship
+			spaceship.drawBody();
+			// also draw the aliens
+			alienShipFactory.animateAliens();
 
 			
 		}	
