@@ -25,5 +25,6 @@ canvas {
 }
 
 .ocean {
-	background: url(../img/Ocean.jpeg);
+	background: url(../img/OceanAnim.png);
+	background-size: cover;
 }

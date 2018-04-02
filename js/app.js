@@ -1,3 +1,19 @@
+// STILL TO DO
+
+// give aliens hp / make them more difficult to kill
+
+// give ship hp 
+// make it so that random alien ships can shoot back at random intervals
+
+// make the animations sprites / images instead of dots 
+
+// style the landing page / other game text
+
+// make a modal for when you hit an alien ship
+
+// make an instructions page that the user can click on the landing page
+// figure out how to put the buttons in the right place
+
 const canvas = document.getElementById('my-canvas');
 
 const ctx = canvas.getContext('2d');
@@ -40,28 +56,26 @@ const theGame = {
 		alienShipFactory.alienShips = [];
 
 		const alienShipX = ((canvas.width - 100) / numOfAliens)
-		console.log(alienShipX);
 		let alienShipXPos = alienShipX;
 
 		for (let i = 1; i <= numOfAliens; i++) {
 			alienShipFactory.generateAlienShips(alienShipXPos);
-			// alienShips[i].initialize(alienShipXPos);
 
 			alienShipXPos += alienShipX
-			console.log("alienShipXPos = " + alienShipXPos);
-
 		}
 
 		$('#level').text("LEVEL ONE")
+		$('#ships-destroyed').text("Alien Ships Destroyed: " + this.shipsDestroyed.length)
 		$('#ships-remaining').text("Alien Ships Remaining: " + alienShipFactory.alienShips.length)
-
-	}
+	},
+	shipsDestroyed: []
 }
 
 // make a ship class
 const spaceship = {
 	body: {},
 	direction: "right",
+	firepower: 2,
 	initialize () {
 		this.body = {
 			x: 400,
@@ -105,7 +119,7 @@ class AlienShip {
 			r: 12.5,
 			e: 0	
 		}
-		console.log(this.body);
+		this.hull = 10
 	}
 	drawBody() {
 		ctx.beginPath();
@@ -163,7 +177,7 @@ class Shot {
 				x: this.x,
 				y: this.y
 			});
-			if (this.positions.length > 100) { // 10 is the length of the motion trail. hardcoding because I won't need it to change
+			if (this.positions.length > 100) { 
 				this.positions.shift();
 			}
 		}	
@@ -182,9 +196,9 @@ function getDistance(x1, y1, x2, y2) {
 
 
 
+
 function gamePlayAnimation (e) {
 	const key = e.keyCode;
-
 
 	if (key === 39) {
 		ctx.clearRect(0,0, canvas.width, canvas.height);
@@ -202,12 +216,54 @@ function gamePlayAnimation (e) {
 		alienShipFactory.animateAliens();
 	} else if (key === 32) {
 		requestAnimationFrame(gamePlayAnimation)
-		
+
 		// fire the shot
 		const shot = new Shot(spaceship.body.x, spaceship.body.y);
+		let didYouHit = false;
+
+		const checkForCollision = () => {
+			for (k = 0; k < alienShipFactory.alienShips.length; k++) {
+						
+				if (alienShipFactory.alienShips.length === 0) {
+					console.log("You have destroyed all of the alien ships. Click continue to move on to the next level.");
+					// spaceship.drawBody();
+				}
+
+				if (getDistance(shot.x, shot.y, alienShipFactory.alienShips[k].body.x, alienShipFactory.alienShips[k].body.y) < alienShipFactory.alienShips[k].body.r + shot.r) {
+					cancelAnimationFrame(gamePlayAnimation)
+					console.log("You hit the alien ship.");
+					didYouHit = true;
+					checkForDestruction(k);
+					// return k;
+				}
+			}
+		}
+
+		const checkForDestruction = (k) => {
+			if (typeof(k) != "number") {
+				console.log("nothing happened because you didn't hit the ship.");
+			} else {
+				console.log(alienShipFactory.alienShips[k]);
+				alienShipFactory.alienShips[k].hull -= spaceship.firepower;
+			
+
+				if (alienShipFactory.alienShips[k].hull <= 0) {
+					theGame.shipsDestroyed.push(alienShipFactory.alienShips[k])
+					// remove that alien ship from the array
+					alienShipFactory.alienShips.splice(k,1);
+					$('#ships-remaining').text("Alien Ships Remaining: " + alienShipFactory.alienShips.length)
+					// add it to ships destroyed array to track how many have been destroyed
+					$('#ships-destroyed').text("Alien Ships Destroyed: " + theGame.shipsDestroyed.length)
+					console.log('ship destroyed');
+					return true;
+				} else {
+					return;
+				}
+			}
+		}
 
 		// move the shot
-		for (let i = spaceship.body.y; i > -100; i -= 1) { 
+		for (let i = spaceship.body.y; i > 100; i -= 1) { 
 			ctx.clearRect(0,0, canvas.width, canvas.height);
 			
 			// draw the motion trail 
@@ -230,31 +286,48 @@ function gamePlayAnimation (e) {
 			shot.y -= 1;
 
 			// collision detection
-			for (let k = 0; k < alienShipFactory.alienShips.length; k++) {
-				
-			 	if (getDistance(shot.x, shot.y, alienShipFactory.alienShips[k].body.x, alienShipFactory.alienShips[k].body.y) < alienShipFactory.alienShips[k].body.r + shot.r) {
-					console.log("You hit the alien ship.");
-					// remove that alien ship from the array
-					alienShipFactory.alienShips.splice(k,1);
-					$('#ships-remaining').text("Alien Ships Remaining: " + alienShipFactory.alienShips.length)
-				if (alienShipFactory.alienShips.length === 0) {
-					console.log("You have destroyed all of the alien ships. Click continue to move on to the next level.");
-					cancelAnimationFrame(gamePlayAnimation)
-
-				// get the sho to stop moving
-				}
-				
+			if (didYouHit === false) {
+				if (checkForCollision() === true) {
+				console.log("You destroyed the alien ship.");
+				};
 			}
 			
-		}
+			// for (let k = 0; k < alienShipFactory.alienShips.length; k++) {
+				
+			//  	if (alienShipFactory.alienShips.length === 0) {
+			// 		console.log("You have destroyed all of the alien ships. Click continue to move on to the next level.");
+			// 		spaceship.drawBody();
+			// 	}
 
-		// also draw the spaceship
-		spaceship.drawBody();
-		// also draw the aliens
-		alienShipFactory.animateAliens();
-	}	
+			//  	if (getDistance(shot.x, shot.y, alienShipFactory.alienShips[k].body.x, alienShipFactory.alienShips[k].body.y) < alienShipFactory.alienShips[k].body.r + shot.r) {
+			// 		cancelAnimationFrame(gamePlayAnimation)
+
+			// 		console.log("You hit the alien ship.");
+			// 		// push that one into the ships destroyed array
+			// 		if (checkForDestruction(k) === true) {
+			// 			// also draw the spaceship
+			// 			spaceship.drawBody();
+			// 			// also draw the aliens
+			// 			alienShipFactory.animateAliens();
+			// 			return;
+					
+			// 		}
+
+
+			// 	}
+
+			// }
+				// also draw the spaceship
+				spaceship.drawBody();
+				// also draw the aliens
+				alienShipFactory.animateAliens();
+
+			
+		}	
 	}
 }
+
+
 
 $('html').keydown(function(e) {
 	gamePlayAnimation(e);
