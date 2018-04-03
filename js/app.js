@@ -19,16 +19,20 @@ let handle;
 $('#start').on('click', () => {
 	// ctx.clearRect(0, 0, canvas.width, canvas.height);
 	$('#intro-screen').detach();
+	theGame.startGame();
+	// const stuffToRemove = $('#canvas-holder').children();
+	// stuffToRemove.detach()
 	// $('#canvas-holder').append($('<canvas>'))
 	// $('canvas').attr('id','my-canvas')
-	$('canvas').attr('width', '800px');
-	$('canvas').attr('height', '800px');
+	// $('canvas').attr('width', '800px');
+	// $('canvas').attr('height', '800px');
 
-	$('canvas').addClass('ocean')
-	$('#start').detach();
-	theGame.startGame();
-	spaceship.initialize()
-	spaceship.drawBody()
+	// $('canvas').addClass('ocean')
+	// $('#start').detach();
+	// theGame.startGame();
+	// spaceship.initialize()
+	// spaceship.drawBody()
+	// window.setInterval(alienFire, 1000)
 })
 
 const getRandomInteger = (min, max) => {
@@ -42,6 +46,18 @@ const getRandomInteger = (min, max) => {
 const theGame = {
 	numOfAliens: 0,
 	startGame() {
+		$('canvas').attr('width', '800px');
+		$('canvas').attr('height', '800px');
+	
+		$('canvas').addClass('ocean')
+		$('#start').detach();
+		
+		spaceship.initialize()
+		spaceship.drawBody()
+		let alienShots;
+		window.clearInterval(alienShots);
+		alienShots = window.setInterval(alienFire, 1000)
+
 		this.numOfAliens = getRandomInteger(5, 11)
 		alienShipFactory.alienShips = [];
 
@@ -57,11 +73,31 @@ const theGame = {
 		}
 
 		$('#level').text("LEVEL ONE")
+		$('#player-stats').text("Hull Points: " + spaceship.hull)
 		$('#ships-destroyed').text("Ships Destroyed: " + this.shipsDestroyed)
 		$('#ships-remaining').text("Ships Remaining: " + alienShipFactory.alienShips.length)
 		gamePlayAnimation();
 	},
-	shipsDestroyed: 0
+	shipsDestroyed: 0,
+	endGame() {
+		console.log("end game is being called successfully")
+		ctx.clearRect(0,0, canvas.width, canvas.height);
+		$('canvas').attr('width', '0');
+		$('canvas').attr('height', '0');
+		$('canvas').removeClass("ocean")
+		
+		const endScreen = $('<div>').attr("id", "end-screen")
+		const endSpan = $('<span>').text("GAME OVER")
+		endSpan.attr("id", "end-text")
+		endSpan.appendTo(endScreen)
+		const playAgain = $('<div>').text("PLAY AGAIN").addClass("buttons")
+		playAgain.on('click', () =>{
+			endScreen.detach();
+			this.startGame()
+		})
+		playAgain.appendTo(endScreen)
+		endScreen.appendTo($("#canvas-holder"));
+	}
 }
 
 // make a ship
@@ -69,7 +105,7 @@ const spaceship = {
 	body: {},
 	direction: "right",
 	firepower: 2,
-	hull: 10,
+	hull: 1,
 	alive: true,
 	initialize () {
 		this.body = {
@@ -78,6 +114,8 @@ const spaceship = {
 			r: 12.50,
 			e: 0
 		}
+		this.hull = 1
+		this.alive = true
 	},
 
 	move (direction) {
@@ -277,18 +315,26 @@ class Shot {
 		}
 		this.didYouHitShip = false;
 		this.checkForShipCollision = function() {
-			if (getDistance(this.x, this.y, spaceship.body.x, spaceship.body.y) < spaceship.body.r + this.r) {
+			if (spaceship.alive === false) {
+				return;
+			} else if (spaceship.alive === true) {
+				if (getDistance(this.x, this.y, spaceship.body.x, spaceship.body.y) < spaceship.body.r + this.r) {
 				console.log("Your ship has been hit!")
 				alienShotsFired.shift()
 				this.didYouHitShip = true;
 				spaceship.hull -= 1;
 				$('#player-stats').text("Hull points: " + spaceship.hull)
 				// this.checkForShipDestruction()
+				}
+				if (spaceship.hull <= 0) {
+					console.log("The aliens have destroyed your ship. Game Over.")
+					spaceship.alive = false;
+					toggleModal2();
+					theGame.endGame();
+					
+				}
 			}
-			if (spaceship.hull <= 0) {
-				console.log("The aliens have destroyed your ship. Game Over.")
-				spaceship.alive = false;
-			}
+			
 		}
 	}	
 }
@@ -494,10 +540,16 @@ function gamePlayAnimation(e) {
 // MODAL STUFF
 
 const modal = $('.modal');
+const modal2 = $('.modal2');
 
 const toggleModal = () => {
     modal.toggleClass("show-modal")
     modal.on('click', toggleModal);
+}
+
+const toggleModal2 = () => {
+	modal2.toggleClass("show-modal");
+	modal2.on('click', toggleModal2)
 }
 
 $('#instructions').on('click', () => {
@@ -511,6 +563,7 @@ $('html').keydown(function(e) {
 	let key = e.keyCode;
 
 
+
 	if (key === 39) {
 		spaceship.direction = 'right'
 		spaceship.move('right');
@@ -521,7 +574,6 @@ $('html').keydown(function(e) {
 		const shot = new Shot(spaceship.body.x, spaceship.body.y, -10);
 		shotsFired.push(shot)
 		shot.didYouHitAlien = false;
-		alienFire()
 		// if (shot.y == 100) {
 		// 	shot.checkForAlienCollision();
 		// }

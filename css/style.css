@@ -17,7 +17,7 @@ body {
 	width: 800px;
 }
 
-#intro-screen{
+#intro-screen, #end-screen{
 	font-family: 'Righteous';
 	color: blue;
 	display: flex;
@@ -26,12 +26,17 @@ body {
 	justify-content: space-around;
 }
 
-#title {
+#title, #end-text {
 	padding-top: 150px;
 	font-size: 180px;
 	margin-left: auto;
 	margin-right: auto;
 	letter-spacing: .9rem;
+}
+
+#end-text {
+	font-size: 100px;
+	padding-top: 0;
 }
 
 #control-panel{
