@@ -169,10 +169,16 @@ class Shot {
 		}
 
 		this.update = function() {
-			this.y += this.dy;
-			// console.log(this.y);
-			this.draw();
-			// console.log("shot update is being called")
+			if(this.y + this.dy > 0) {
+				this.y += this.dy;
+				this.draw();
+				this.checkForAlienCollision();
+			} else if (this.y <= 0) {
+				shotsFired.shift()
+			} else if (this.didYouHit === false) {
+				shotsFired.shift()
+			}
+			
 		}
 		this.positions = [];
 		this.storeLastPosition = function(xPos, yPos) {
@@ -211,30 +217,39 @@ class Shot {
 		}
 		this.didYouHit = false;
 		this.checkForAlienCollision = function() {
-			for (let i = 0; i < alienShipFactory.alienShips.length; i++) {
+			if (this.didYouHit === false) {
+				for (let i = 0; i < alienShipFactory.alienShips.length; i++) {
 				if (alienShipFactory.alienShips.length === 0) {
 					console.log("You have destroyed all of the alien ships. Click continue to move on to the next level.");
-	// 				// spaceship.drawBody(); // not sure why this is here but it was commented out in original code so tbd
 				}
 				if (getDistance(this.x, this.y, alienShipFactory.alienShips[i].body.x, alienShipFactory.alienShips[i].body.y) < alienShipFactory.alienShips[i].body.r + this.r) {
-	// 				cancelAnimationFrame(gamePlayAnimation) // not sure if this belongs here, leaving it here in case
+					console.log(this.x, this.y, alienShipFactory.alienShips[i].body.x, alienShipFactory.alienShips[i].body.y)
 					console.log("You hit the alien ship.");
+					shotsFired.shift()
 					this.didYouHit = true;
 					this.checkForAlienDestruction(i)
+
 					// return true;
 				}
+			} 
+			} else {
+				return;
 			}
+			
+			
 			
 		}
 		this.checkForAlienDestruction = function(k) {
 			if (typeof(k) != "number") {
 				console.log("nothing happened because you didn't hit the ship.");
+			} else if (this.y < 0) {
+				return;
 			} else {
 				// console.log(alienShipFactory.alienShips[k]);
 				alienShipFactory.alienShips[k].hull -= spaceship.firepower;
-			
-
-				if (alienShipFactory.alienShips[k].hull <= 0) {
+				if (alienShipFactory.alienShips[k].hull > 0) {
+					return;
+				} else if (alienShipFactory.alienShips[k].hull <= 0) {
 					theGame.shipsDestroyed.push(alienShipFactory.alienShips[k])
 	// 				// remove that alien ship from the array
 					alienShipFactory.alienShips.splice(k,1);
@@ -242,9 +257,9 @@ class Shot {
 	// 				// add it to ships destroyed array to track how many have been destroyed
 					$('#ships-destroyed').text("Alien Ships Destroyed: " + theGame.shipsDestroyed.length)
 	// 				// toggleModal2();
-					return true;
-				} else {
-					return false;
+					return;
+				// } else {
+				// 	return;
 				}
 			}
 
@@ -329,6 +344,7 @@ function gamePlayAnimation(e) {
 
 	for (let i = 0; i < shotsFired.length; i++) {
 		shotsFired[i].move()
+		// shotsFired[i].checkForAlienCollision();
 	}
 }
 	// if (e === 'shot') {
@@ -475,10 +491,11 @@ $('html').keydown(function(e) {
 		const shot = new Shot(spaceship.body.x, spaceship.body.y);
 		shotsFired.push(shot)
 		shot.didYouHit = false;
-		// console.log(shot)
-		// shot.move();
-		// shot.checkForAlienCollision();
-		// gamePlayAnimation('shot')
+		// if (shot.y == 100) {
+		// 	shot.checkForAlienCollision();
+		// }
+		
+
 	}
 	
 })
