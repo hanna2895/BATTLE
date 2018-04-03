@@ -57,11 +57,11 @@ const theGame = {
 		}
 
 		$('#level').text("LEVEL ONE")
-		$('#ships-destroyed').text("Ships Destroyed: " + this.shipsDestroyed.length)
+		$('#ships-destroyed').text("Ships Destroyed: " + this.shipsDestroyed)
 		$('#ships-remaining').text("Ships Remaining: " + alienShipFactory.alienShips.length)
 		gamePlayAnimation();
 	},
-	shipsDestroyed: []
+	shipsDestroyed: 0
 }
 
 // make a ship
@@ -69,7 +69,8 @@ const spaceship = {
 	body: {},
 	direction: "right",
 	firepower: 2,
-	hull: 100,
+	hull: 10,
+	alive: true,
 	initialize () {
 		this.body = {
 			x: 400,
@@ -150,22 +151,20 @@ const alienShipFactory = {
 // this should occur in the animate canvas function (which may need to take an argument of keypress)
 
 class Shot {
-	constructor(x,y) {
+	constructor(x, y, dy) {
 		this.x = x;
 		this.y = y;
 		this.r = 8;
 		this.e = 0;
 		this.dx = 0;
-		this.dy = -10;
+		this.dy = dy;
 
 		this.draw = function() {
 			ctx.beginPath();
-			// console.log(this.x, this.y, this.r, this.e )
 			ctx.arc(this.x, this.y, this.r, this.e, Math.PI * 2);
 			ctx.fillStyle = "red";
 			ctx.fill();
 			ctx.closePath();
-			// console.log("shot draw is being called")
 		}
 
 		this.update = function() {
@@ -175,11 +174,23 @@ class Shot {
 				this.checkForAlienCollision();
 			} else if (this.y <= 0) {
 				shotsFired.shift()
-			} else if (this.didYouHit === false) {
+			} else if (this.didYouHitAlien === false) {
 				shotsFired.shift()
 			}
 			
 		}
+		this.updateAlien = function() {
+			if (this.y + this.dy < 800) {
+				this.y += this.dy;
+				this.draw();
+				this.checkForShipCollision();
+			} else if (this.y >= 800) {
+				alienShotsFired.shift();
+			} else if (this.didYouHitShip === false) {
+				alienShotsFired.shift();
+			}
+		}
+
 		this.positions = [];
 		this.storeLastPosition = function(xPos, yPos) {
 			this.positions.push ({
@@ -215,9 +226,9 @@ class Shot {
 	// 		// shot.y -= 1;
 	// 		}
 		}
-		this.didYouHit = false;
+		this.didYouHitAlien = false;
 		this.checkForAlienCollision = function() {
-			if (this.didYouHit === false) {
+			if (this.didYouHitAlien === false) {
 				for (let i = 0; i < alienShipFactory.alienShips.length; i++) {
 				if (alienShipFactory.alienShips.length === 0) {
 					console.log("You have destroyed all of the alien ships. Click continue to move on to the next level.");
@@ -226,7 +237,7 @@ class Shot {
 					console.log(this.x, this.y, alienShipFactory.alienShips[i].body.x, alienShipFactory.alienShips[i].body.y)
 					console.log("You hit the alien ship.");
 					shotsFired.shift()
-					this.didYouHit = true;
+					this.didYouHitAlien = true;
 					this.checkForAlienDestruction(i)
 
 					// return true;
@@ -250,12 +261,12 @@ class Shot {
 				if (alienShipFactory.alienShips[k].hull > 0) {
 					return;
 				} else if (alienShipFactory.alienShips[k].hull <= 0) {
-					theGame.shipsDestroyed.push(alienShipFactory.alienShips[k])
+					theGame.shipsDestroyed += 1;
 	// 				// remove that alien ship from the array
 					alienShipFactory.alienShips.splice(k,1);
-					$('#ships-remaining').text("Alien Ships Remaining: " + alienShipFactory.alienShips.length)
+					$('#ships-remaining').text("Ships Remaining: " + alienShipFactory.alienShips.length)
 	// 				// add it to ships destroyed array to track how many have been destroyed
-					$('#ships-destroyed').text("Alien Ships Destroyed: " + theGame.shipsDestroyed.length)
+					$('#ships-destroyed').text("Ships Destroyed: " + theGame.shipsDestroyed)
 	// 				// toggleModal2();
 					return;
 				// } else {
@@ -264,10 +275,26 @@ class Shot {
 			}
 
 		}
+		this.didYouHitShip = false;
+		this.checkForShipCollision = function() {
+			if (getDistance(this.x, this.y, spaceship.body.x, spaceship.body.y) < spaceship.body.r + this.r) {
+				console.log("Your ship has been hit!")
+				alienShotsFired.shift()
+				this.didYouHitShip = true;
+				spaceship.hull -= 1;
+				$('#player-stats').text("Hull points: " + spaceship.hull)
+				// this.checkForShipDestruction()
+			}
+			if (spaceship.hull <= 0) {
+				console.log("The aliens have destroyed your ship. Game Over.")
+				spaceship.alive = false;
+			}
+		}
 	}	
 }
 
 const shotsFired = [];
+const alienShotsFired = [];
 
 // collision detection utility function
 function getDistance(x1, y1, x2, y2) {
@@ -280,56 +307,57 @@ function getDistance(x1, y1, x2, y2) {
 
 function alienFire() {
 	const randomAlienShip = alienShipFactory.alienShips[Math.floor(Math.random()*alienShipFactory.alienShips.length)]
-	const alienShot = new Shot(randomAlienShip.body.x, randomAlienShip.body.y);
+	const alienShot = new Shot(randomAlienShip.body.x, randomAlienShip.body.y, 10);
+	alienShotsFired.push(alienShot)
 	let wereYouHit = false;
 
-	if (alienShipFactory.alienShips.length === 0) {
-		// DO NOTHING
-		return;
-	} else {
-		for (let i = randomAlienShip.body.y; i < 700; i += 1) { 
-			ctx.clearRect(0,0, canvas.width, canvas.height);
-	
+	// if (alienShipFactory.alienShips.length === 0) {
+	// 	// DO NOTHING
+	// 	return;
+	// } else {
+	// 	for (let i = randomAlienShip.body.y; i < 700; i += 1) { 
+	// 		// ctx.clearRect(0,0, canvas.width, canvas.height);
+	// 		alienShot.y += 1;
 		// draw the motion trail 
-		for (let j = 0; j < alienShot.positions.length; j++) {
-			const ratio = (i + 150) / alienShot.positions.length
-			ctx.beginPath();
-			ctx.arc(alienShot.positions[j].x, alienShot.positions[j].y, 10, 0, 2*Math.PI, true);
-			ctx.fillStyle ='rgba(204, 102, 153, ' + ratio / 2 + ")";
-			ctx.fill();
-		}
+		// for (let j = 0; j < alienShot.positions.length; j++) {
+		// 	const ratio = (i + 150) / alienShot.positions.length
+		// 	ctx.beginPath();
+		// 	ctx.arc(alienShot.positions[j].x, alienShot.positions[j].y, 10, 0, 2*Math.PI, true);
+		// 	ctx.fillStyle ='rgba(204, 102, 153, ' + ratio / 2 + ")";
+		// 	ctx.fill();
+		// }
 	
 		// redraw the shot on the canvas
-		alienShot.draw()
+		// alienShot.draw()
 		// store where the shot is for motion trail
-		alienShot.storeLastPosition(alienShot.x, alienShot.y)
+		// alienShot.storeLastPosition(alienShot.x, alienShot.y)
 		// change the shot's position
-		alienShot.y += 1;
+		
 
 	}
 	// check for collision
 	
-	if (wereYouHit === false) {
-		if (getDistance(alienShot.x, alienShot.y, spaceship.body.x, spaceship.body.y) < spaceship.body.r + alienShot.r) {
-			// cancelAnimationFrame(gamePlayAnimation)
-			console.log("The alien lasers hit your ship.");
-			spaceship.hull -= 1;
-			$('#player-stats').text("Hull points: " + spaceship.hull)
-			wereYouHit = true;
-		}
-	} else {
-		if (spaceship.hull <= 0) {
-			console.log("The aliens have destroyed your ship. game over.");
-			return;
-		}
-	}
+	// if (wereYouHit === false) {
+	// 	if (getDistance(alienShot.x, alienShot.y, spaceship.body.x, spaceship.body.y) < spaceship.body.r + alienShot.r) {
+	// 		// cancelAnimationFrame(gamePlayAnimation)
+	// 		console.log("The alien lasers hit your ship.");
+	// 		spaceship.hull -= 1;
+	// 		$('#player-stats').text("Hull points: " + spaceship.hull)
+	// 		wereYouHit = true;
+	// 	}
+	// } else {
+	// 	if (spaceship.hull <= 0) {
+	// 		console.log("The aliens have destroyed your ship. game over.");
+	// 		return;
+	// 	}
+	// }
 	
-	// also draw the spaceship
-	spaceship.drawBody();
-	// also draw the aliens
-	alienShipFactory.animateAliens();
-}
-}
+	// // also draw the spaceship
+	// spaceship.drawBody();
+	// // also draw the aliens
+// 	// alienShipFactory.animateAliens();
+// }
+// }
 
 
 function gamePlayAnimation(e) {
@@ -344,7 +372,9 @@ function gamePlayAnimation(e) {
 
 	for (let i = 0; i < shotsFired.length; i++) {
 		shotsFired[i].move()
-		// shotsFired[i].checkForAlienCollision();
+	}
+	for (let j = 0; j < alienShotsFired.length; j++) {
+		alienShotsFired[j].updateAlien();
 	}
 }
 	// if (e === 'shot') {
@@ -488,9 +518,10 @@ $('html').keydown(function(e) {
 		spaceship.direction = 'left'
 		spaceship.move('left');
 	} else if (key === 32) {
-		const shot = new Shot(spaceship.body.x, spaceship.body.y);
+		const shot = new Shot(spaceship.body.x, spaceship.body.y, -10);
 		shotsFired.push(shot)
-		shot.didYouHit = false;
+		shot.didYouHitAlien = false;
+		alienFire()
 		// if (shot.y == 100) {
 		// 	shot.checkForAlienCollision();
 		// }
