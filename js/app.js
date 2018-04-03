@@ -1,11 +1,6 @@
 // STILL TO DO
 
-// give ship hp 
-// make it so that random alien ships can shoot back at random intervals
 
-// make the animations sprites / images instead of dots 
-
-// make a modal for when you hit or destroy an alien ship
 
 const canvas = document.getElementById('my-canvas');
 
@@ -14,6 +9,7 @@ const ctx = canvas.getContext('2d');
 // some global variables
 const speed = 20;
 let handle;
+let alienShots;
 
 // button to start the game
 $('#start').on('click', () => {
@@ -41,7 +37,7 @@ const theGame = {
 		
 		spaceship.initialize()
 		spaceship.drawBody()
-		let alienShots;
+		
 		window.clearInterval(alienShots);
 		alienShots = window.setInterval(alienFire, 1000)
 
@@ -67,7 +63,6 @@ const theGame = {
 	},
 	shipsDestroyed: 0,
 	endGame() {
-		console.log("end game is being called successfully")
 		ctx.clearRect(0,0, canvas.width, canvas.height);
 		$('canvas').attr('width', '0');
 		$('canvas').attr('height', '0');
@@ -75,6 +70,23 @@ const theGame = {
 		
 		const endScreen = $('<div>').attr("id", "end-screen")
 		const endSpan = $('<span>').text("GAME OVER")
+		endSpan.attr("id", "end-text")
+		endSpan.appendTo(endScreen)
+		const playAgain = $('<div>').text("PLAY AGAIN").addClass("buttons")
+		playAgain.on('click', () =>{
+			endScreen.detach();
+			this.startGame()
+		})
+		playAgain.appendTo(endScreen)
+		endScreen.appendTo($("#canvas-holder"));
+	},
+	winGame() {
+		ctx.clearRect(0,0, canvas.width, canvas.height);
+		$('canvas').attr('width', '0');
+		$('canvas').attr('height', '0');
+		$('canvas').removeClass("ocean")
+		const endScreen = $('<div>').attr("id", "end-screen")
+		const endSpan = $('<span>').text("YOU DEFEATED THE ALIENS")
 		endSpan.attr("id", "end-text")
 		endSpan.appendTo(endScreen)
 		const playAgain = $('<div>').text("PLAY AGAIN").addClass("buttons")
@@ -98,8 +110,7 @@ const spaceship = {
 		this.body = {
 			x: 400,
 			y: 700, 
-			r: 12.50,
-			e: 0
+			r: 20
 		}
 		this.hull = 100
 		this.alive = true
@@ -110,32 +121,20 @@ const spaceship = {
 			case 'right':
 				if (this.body.x + speed < canvas.width) {
 					this.body.x = this.body.x + speed;
-					console.log("right case")
 				}
 				break;
 			case 'left': 
 				if (this.body.x - speed > 0) {
 					this.body.x = this.body.x - speed;
-					console.log("Left case")
 				} 
 				break;
 		}
-
-		// this.drawBody()
-		console.log("drew body")
-
 	},
 	drawBody() {
 		const img = new Image();
 		img.src = "img/spaceship1.png"
-
-
-
 		ctx.beginPath();
-		ctx.drawImage(img, this.body.x, this.body.y);
-		// ctx.arc(this.body.x, this.body.y, this.body.r, this.body.e, Math.PI * 2);
-		// ctx.fillStyle = "f00";
-		// ctx.fill();
+		ctx.drawImage(img, (this.body.x-40), this.body.y);
 		ctx.closePath();
 	}
 }
@@ -148,16 +147,18 @@ class AlienShip {
 			id: id,
 			x: x,
 			y: 100,
-			r: 12.5,
-			e: 0	
+			r: 20,	
 		}
 		this.hull = 10
 	}
 	drawBody() {
+		const img = new Image();
+		img.src = "img/spaceship2.png"
 		ctx.beginPath();
-		ctx.arc(this.body.x, this.body.y, this.body.r, this.body.e, Math.PI * 2);
-		ctx.fillStyle = "green";
-		ctx.fill();
+		ctx.drawImage(img, this.body.x-40, this.body.y-30)
+		// ctx.arc(this.body.x, this.body.y, this.body.r, this.body.e, Math.PI * 2);
+		// ctx.fillStyle = "green";
+		// ctx.fill();
 		ctx.closePath();
 	}
 }
@@ -185,7 +186,7 @@ class Shot {
 	constructor(x, y, dy) {
 		this.x = x;
 		this.y = y;
-		this.r = 8;
+		this.r = 5;
 		this.e = 0;
 		this.dx = 0;
 		this.dy = dy;
@@ -265,21 +266,15 @@ class Shot {
 					console.log("You have destroyed all of the alien ships. Click continue to move on to the next level.");
 				}
 				if (getDistance(this.x, this.y, alienShipFactory.alienShips[i].body.x, alienShipFactory.alienShips[i].body.y) < alienShipFactory.alienShips[i].body.r + this.r) {
-					console.log(this.x, this.y, alienShipFactory.alienShips[i].body.x, alienShipFactory.alienShips[i].body.y)
-					console.log("You hit the alien ship.");
+		
 					shotsFired.shift()
 					this.didYouHitAlien = true;
-					this.checkForAlienDestruction(i)
-
-					// return true;
+					this.checkForAlienDestruction(i);
 				}
 			} 
 			} else {
 				return;
 			}
-			
-			
-			
 		}
 		this.checkForAlienDestruction = function(k) {
 			if (typeof(k) != "number") {
@@ -287,7 +282,7 @@ class Shot {
 			} else if (this.y < 0) {
 				return;
 			} else {
-				// console.log(alienShipFactory.alienShips[k]);
+
 				alienShipFactory.alienShips[k].hull -= spaceship.firepower;
 				if (alienShipFactory.alienShips[k].hull > 0) {
 					return;
@@ -299,7 +294,11 @@ class Shot {
 	// 				// add it to ships destroyed array to track how many have been destroyed
 					$('#ships-destroyed').text("Ships Destroyed: " + theGame.shipsDestroyed)
 	// 				// toggleModal2();
-					return;
+					if (alienShipFactory.alienShips.length <= 0) {
+						theGame.winGame();
+					} else {
+						return;
+					}
 				// } else {
 				// 	return;
 				}
@@ -344,10 +343,16 @@ function getDistance(x1, y1, x2, y2) {
 }
 
 
+
 function alienFire() {
-	const randomAlienShip = alienShipFactory.alienShips[Math.floor(Math.random()*alienShipFactory.alienShips.length)]
-	const alienShot = new Shot(randomAlienShip.body.x, randomAlienShip.body.y, 10);
-	alienShotsFired.push(alienShot)
+	if (alienShipFactory.alienShips.length === 0) {
+		clearInterval(alienShots)
+	} else {
+		const randomAlienShip = alienShipFactory.alienShips[Math.floor(Math.random()*alienShipFactory.alienShips.length)]
+		const alienShot = new Shot(randomAlienShip.body.x, randomAlienShip.body.y, 10);
+		alienShotsFired.push(alienShot)
+	}
+	
 }
 
 
@@ -387,7 +392,6 @@ const toggleModal2 = () => {
 }
 
 $('#instructions').on('click', () => {
-	// $('.modal-content').text(""
 	toggleModal();
 });
 
@@ -396,8 +400,6 @@ $('#instructions').on('click', () => {
 $('html').keydown(function(e) {
 	let key = e.keyCode;
 
-
-
 	if (key === 39) {
 		spaceship.direction = 'right'
 		spaceship.move('right');
@@ -405,14 +407,9 @@ $('html').keydown(function(e) {
 		spaceship.direction = 'left'
 		spaceship.move('left');
 	} else if (key === 32) {
-		const shot = new Shot(spaceship.body.x + 40, spaceship.body.y + 40, -10);
+		const shot = new Shot(spaceship.body.x, spaceship.body.y + 40, -10);
 		shotsFired.push(shot)
 		shot.didYouHitAlien = false;
-		// if (shot.y == 100) {
-		// 	shot.checkForAlienCollision();
-		// }
-		
-
 	}
 	
 })
