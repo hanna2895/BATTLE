@@ -17,7 +17,7 @@ body {
 	width: 800px;
 }
 
-#intro-screen, #end-screen{
+#intro-screen, #end-screen, #next-screen{
 	font-family: 'Righteous';
 	color: blue;
 	display: flex;
@@ -26,7 +26,7 @@ body {
 	justify-content: space-around;
 }
 
-#title, #end-text {
+#title, #end-text, #next-text {
 	padding-top: 150px;
 	font-size: 180px;
 	margin-left: auto;
@@ -34,7 +34,7 @@ body {
 	letter-spacing: .9rem;
 }
 
-#end-text {
+#end-text, #next-text {
 	font-size: 100px;
 	padding-top: 0;
 	text-align: center;
@@ -93,8 +93,24 @@ canvas {
 	background-size: cover;
 }
 
+/*LEVEL TWO*/
 
+.desert {
+	background: url(../img/Desert.png);
+}
 
+/*LEVEL THREE*/
+
+.arctic {
+	background: url(../img/Arctic.jpg);
+}
+
+/*LEVEL FOUR*/
+
+.city {
+	background: url(../img/City.jpg);
+	background-size: cover;
+}
 
 /*stuff for modal*/
 

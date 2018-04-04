@@ -12,6 +12,9 @@ const ctx = canvas.getContext('2d');
 const speed = 20;
 let handle;
 let alienShots;
+let shotsFired = [];
+let alienShotsFired = [];
+let animate;
 
 // button to start the game
 $('#start').on('click', () => {
@@ -31,21 +34,11 @@ const getRandomInteger = (min, max) => {
 const theGame = {
 	numOfAliens: 0,
 	shipsDestroyed: 0,
-	startGame() {
-		$('canvas').attr('width', '800px');
-		$('canvas').attr('height', '800px');
-	
-		$('canvas').addClass('ocean')
-		$('#start').detach();
-		
-		spaceship.initialize()
-		spaceship.drawBody()
-		
-		window.clearInterval(alienShots);
-		alienShots = window.setInterval(alienFire, 1000)
-
-		this.numOfAliens = getRandomInteger(5, 11)
+	level: 1,
+	newAliens (num) {
+		this.numOfAliens = num;
 		alienShipFactory.alienShips = [];
+		alienShotsFired = [];
 
 		const alienShipX = ((canvas.width - 100) / this.numOfAliens)
 		let alienShipXPos = alienShipX;
@@ -57,6 +50,39 @@ const theGame = {
 			// alienShipFactory.alienShips[i].shipId = (i + 1)
 			$('<div>').attr('id', alienShipFactory.alienShips[i-1].body.id.toString()).text("Ship " + alienShipFactory.alienShips[i-1].body.id + ": " + alienShipFactory.alienShips[i-1].hull).appendTo($('#alien-stats'))
 		}
+	},
+	startGame() {
+		cancelAnimationFrame(animate);
+		$('canvas').attr('width', '800px');
+		$('canvas').attr('height', '800px');
+	
+		$('canvas').addClass('ocean')
+		$('#start').detach();
+
+		this.level = 1;
+		
+		spaceship.initialize()
+		spaceship.drawBody()
+		
+		window.clearInterval(alienShots);
+		alienShots = window.setInterval(alienFire, 1000)
+
+		this.newAliens(4)
+
+
+		// this.numOfAliens = getRandomInteger(5, 11)
+		// alienShipFactory.alienShips = [];
+
+		// const alienShipX = ((canvas.width - 100) / this.numOfAliens)
+		// let alienShipXPos = alienShipX;
+
+		// for (let i = 1; i <= this.numOfAliens; i++) {
+		// 	alienShipFactory.generateAlienShips(alienShipXPos, i);
+
+		// 	alienShipXPos += alienShipX
+		// 	// alienShipFactory.alienShips[i].shipId = (i + 1)
+		// 	$('<div>').attr('id', alienShipFactory.alienShips[i-1].body.id.toString()).text("Ship " + alienShipFactory.alienShips[i-1].body.id + ": " + alienShipFactory.alienShips[i-1].hull).appendTo($('#alien-stats'))
+		// }
 
 		
 
@@ -70,7 +96,104 @@ const theGame = {
 		$('#ships-remaining').text("Ships Remaining: " + alienShipFactory.alienShips.length)
 		gamePlayAnimation();
 	},
+	nextLevel() {
+		ctx.clearRect(0,0, canvas.width, canvas.height);
+		cancelAnimationFrame(gamePlayAnimation)
+		$('canvas').attr('width', '0');
+		$('canvas').attr('height', '0');
+		this.level += 1;
+
+		const nextScreen = $('<div>').attr("id", "next-screen")
+		const nextSpan = $('<span>').text("STAGE CLEARED")
+		nextSpan.attr("id", "next-text")
+		nextSpan.appendTo(nextScreen)
+		const cont = $('<div>').text("CONTINUE").addClass("buttons")
+		cont.on('click', () =>{
+			nextScreen.detach();
+			this.levelUp()
+			// if (this.level === 2) {
+			// 	this.levelTwo()
+			// } else if (this.level === 3) {
+			// 	this.levelThree()
+			// }
+			
+		})
+		cont.appendTo(nextScreen)
+		nextScreen.appendTo($("#canvas-holder"));
+	},
+	levelUp() {
+		cancelAnimationFrame(animate);
+		$('canvas').attr('width', '800');
+		$('canvas').attr('height', '800');
+		window.clearInterval(alienShots);
+		if (this.level === 2) {
+			$('canvas').removeClass('ocean');
+			$('canvas').addClass('desert');
+			alienShots = window.setInterval(alienFire, 800)
+			this.newAliens(8)
+
+			$('#level').text("LEVEL TWO")
+		} else if (this.level === 3) {
+			$('canvas').removeClass('desert');
+			$('canvas').addClass('arctic');
+			alienShots = window.setInterval(alienFire, 600)
+			this.newAliens(10)
+			$('#level').text("LEVEL THREE")
+		} else if (this.level === 4) {
+			$('canvas').removeClass('arctic');
+			$('canvas').addClass('city');	
+			alienShots = window.setInterval(alienFire, 500)
+			this.newAliens(12)
+			$('#level').text("LEVEL FOUR")	
+		}
+		gamePlayAnimation();
+	},
+
+	// levelTwo() {
+	// 	cancelAnimationFrame(animate);
+	// 	$('canvas').attr('width', '800');
+	// 	$('canvas').attr('height', '800');
+	// 	$('canvas').removeClass('ocean');
+	// 	$('canvas').addClass('desert');
+
+	// 	shotsFired = [];
+
+	// 	window.clearInterval(alienShots);
+	// 	alienShots = window.setInterval(alienFire, 800)
+
+	// 	this.newAliens(8)
+
+	// 	$('#level').text("LEVEL TWO")
+
+	// 	gamePlayAnimation();
+	// 	//stop animation
+	// 	// remove ocean class
+	// 	// add desert class
+	// 	// get aliens
+	// 	// get ship
+	// 	// display all the stuff (but some of it is the same)/
+	// 	// start the animation
+	// },
+	// levelThree(){
+	// 	cancelAnimationFrame(gamePlayAnimation);
+	// 	$('canvas').attr('width', '800');
+	// 	$('canvas').attr('height', '800');
+	// 	$('canvas').removeClass('desert');
+	// 	$('canvas').addClass('arctic');
+
+	// 	shotsFired = [];
+
+	// 	window.clearInterval(alienShots);
+	// 	alienShots = window.setInterval(alienFire, 600)
+
+	// 	this.newAliens(10)
+
+	// 	$('#level').text("LEVEL THREE")
+
+	// 	gamePlayAnimation();
+	// },
 	endGame() {
+		cancelAnimationFrame(animate);
 		ctx.clearRect(0,0, canvas.width, canvas.height);
 		$('canvas').attr('width', '0');
 		$('canvas').attr('height', '0');
@@ -89,6 +212,7 @@ const theGame = {
 		endScreen.appendTo($("#canvas-holder"));
 	},
 	winGame() {
+		cancelAnimationFrame(animate);
 		ctx.clearRect(0,0, canvas.width, canvas.height);
 		$('canvas').attr('width', '0');
 		$('canvas').attr('height', '0');
@@ -231,41 +355,41 @@ class Shot {
 			}
 		}
 
-		this.positions = [];
-		this.storeLastPosition = function(xPos, yPos) {
-			this.positions.push ({
-				x: this.x,
-				y: this.y
-			});
-			if (this.positions.length > 10) { 
-				this.positions.shift();
-			}
-		}
-		this.move = function() {
-			// console.log("the shot is moving")
-	// 		for (let i = spaceship.body.y; i > 20; i -= 1) { 
-	// // 		ctx.clearRect(0,0, canvas.width, canvas.height);
-				// console.log(this.positions)
-	// // 		// draw the motion trail 
-				// for (let j = 0; j < this.positions.length; j++) {
-				// 	const ratio = (i + 150) / this.positions.length;
+		// this.positions = [];
+		// this.storeLastPosition = function(xPos, yPos) {
+		// 	this.positions.push ({
+		// 		x: this.x,
+		// 		y: this.y
+		// 	});
+		// 	if (this.positions.length > 10) { 
+		// 		this.positions.shift();
+		// 	}
+		// }
+	// 	this.move = function() {
+	// 		// console.log("the shot is moving")
+	// // 		for (let i = spaceship.body.y; i > 20; i -= 1) { 
+	// // // 		ctx.clearRect(0,0, canvas.width, canvas.height);
+	// 			// console.log(this.positions)
+	// // // 		// draw the motion trail 
+	// 			// for (let j = 0; j < this.positions.length; j++) {
+	// 			// 	const ratio = (i + 150) / this.positions.length;
 
-				// 	ctx.beginPath();
-				// 	ctx.arc(this.positions[j].x, this.positions[j].y, 10, 0, 2*Math.PI, true);
-				// 	ctx.fillStyle ='rgba(204, 102, 153, ' + ratio / 2 + ")";
-				// 	ctx.fill();
-				// }
-			this.update();
-	// // 		// redraw the shot on the canvas
-	// 		this.update()
+	// 			// 	ctx.beginPath();
+	// 			// 	ctx.arc(this.positions[j].x, this.positions[j].y, 10, 0, 2*Math.PI, true);
+	// 			// 	ctx.fillStyle ='rgba(204, 102, 153, ' + ratio / 2 + ")";
+	// 			// 	ctx.fill();
+	// 			// }
+	// 		this.update();
+	// // // 		// redraw the shot on the canvas
+	// // 		this.update()
 
-	// // 		// store where the shot is for motion trail
-			// this.storeLastPosition(this.x, this.y);
+	// // // 		// store where the shot is for motion trail
+	// 		// this.storeLastPosition(this.x, this.y);
 
-	// // 		// change the shot's position
-	// 		// shot.y -= 1;
-	// 		}
-		}
+	// // // 		// change the shot's position
+	// // 		// shot.y -= 1;
+	// // 		}
+	// 	}
 		this.didYouHitAlien = false;
 		this.checkForAlienCollision = function() {
 			if (this.didYouHitAlien === false) {
@@ -305,7 +429,7 @@ class Shot {
 					$('#ships-destroyed').text("Ships Destroyed: " + theGame.shipsDestroyed)
 	// 				// toggleModal2();
 					if (alienShipFactory.alienShips.length <= 0) {
-						theGame.winGame();
+						theGame.nextLevel();
 					} else {
 						return;
 					}
@@ -341,8 +465,7 @@ class Shot {
 	}	
 }
 
-const shotsFired = [];
-const alienShotsFired = [];
+
 
 // collision detection utility function
 function getDistance(x1, y1, x2, y2) {
@@ -356,7 +479,7 @@ function getDistance(x1, y1, x2, y2) {
 
 function alienFire() {
 	if (alienShipFactory.alienShips.length === 0) {
-		clearInterval(alienShots)
+		clearInterval(alienShots) 
 	} else {
 		const randomAlienShip = alienShipFactory.alienShips[Math.floor(Math.random()*alienShipFactory.alienShips.length)]
 		const alienShot = new Shot(randomAlienShip.body.x, randomAlienShip.body.y, 10);
@@ -370,15 +493,14 @@ function alienFire() {
 function gamePlayAnimation(e) {
 	ctx.clearRect(0,0, canvas.width, canvas.height);
 
-	requestAnimationFrame(gamePlayAnimation);
+	animate = requestAnimationFrame(gamePlayAnimation);
 
 	// base case if something is meant 	
-
 	spaceship.drawBody();
 	alienShipFactory.animateAliens();
 
 	for (let i = 0; i < shotsFired.length; i++) {
-		shotsFired[i].move()
+		shotsFired[i].update()
 	}
 	for (let j = 0; j < alienShotsFired.length; j++) {
 		alienShotsFired[j].updateAlien();
