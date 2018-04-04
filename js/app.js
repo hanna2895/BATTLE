@@ -1,5 +1,7 @@
 // STILL TO DO
 
+// display alien stats
+
 
 
 const canvas = document.getElementById('my-canvas');
@@ -28,6 +30,7 @@ const getRandomInteger = (min, max) => {
 
 const theGame = {
 	numOfAliens: 0,
+	shipsDestroyed: 0,
 	startGame() {
 		$('canvas').attr('width', '800px');
 		$('canvas').attr('height', '800px');
@@ -52,16 +55,21 @@ const theGame = {
 
 			alienShipXPos += alienShipX
 			// alienShipFactory.alienShips[i].shipId = (i + 1)
-			console.log(alienShipFactory.alienShips);
+			$('<div>').attr('id', alienShipFactory.alienShips[i-1].body.id.toString()).text("Ship " + alienShipFactory.alienShips[i-1].body.id + ": " + alienShipFactory.alienShips[i-1].hull).appendTo($('#alien-stats'))
 		}
 
+		
+
 		$('#level').text("LEVEL ONE")
-		$('#player-stats').text("Hull Points: " + spaceship.hull)
+		// $('#player-stats').text("Your Ship:")
+		$('#player-stats').text("Your Ship")
+		const hp = $('<p>').attr('id', 'hull-points').text("Hull Points: " + spaceship.hull);
+		$('#player-stats').append(hp)
+		
 		$('#ships-destroyed').text("Ships Destroyed: " + this.shipsDestroyed)
 		$('#ships-remaining').text("Ships Remaining: " + alienShipFactory.alienShips.length)
 		gamePlayAnimation();
 	},
-	shipsDestroyed: 0,
 	endGame() {
 		ctx.clearRect(0,0, canvas.width, canvas.height);
 		$('canvas').attr('width', '0');
@@ -284,10 +292,12 @@ class Shot {
 			} else {
 
 				alienShipFactory.alienShips[k].hull -= spaceship.firepower;
+				$('#' + alienShipFactory.alienShips[k].body.id.toString()).text("Ship " + alienShipFactory.alienShips[k].body.id + ": " + alienShipFactory.alienShips[k].hull)
 				if (alienShipFactory.alienShips[k].hull > 0) {
 					return;
 				} else if (alienShipFactory.alienShips[k].hull <= 0) {
 					theGame.shipsDestroyed += 1;
+					$('#' + alienShipFactory.alienShips[k].body.id.toString()).remove()
 	// 				// remove that alien ship from the array
 					alienShipFactory.alienShips.splice(k,1);
 					$('#ships-remaining').text("Ships Remaining: " + alienShipFactory.alienShips.length)
@@ -315,7 +325,7 @@ class Shot {
 				alienShotsFired.shift()
 				this.didYouHitShip = true;
 				spaceship.hull -= 1;
-				$('#player-stats').text("Hull points: " + spaceship.hull)
+				$('#hull-points').text("Hull points: " + spaceship.hull)
 				// this.checkForShipDestruction()
 				}
 				if (spaceship.hull <= 0) {

@@ -37,6 +37,7 @@ body {
 #end-text {
 	font-size: 100px;
 	padding-top: 0;
+	text-align: center;
 }
 
 #control-panel{
@@ -68,13 +69,21 @@ canvas {
 	background-color: brown;
 	margin-right: 2px;
 	font-family: 'Jura', sans-serif;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
 }
 
 #level {
 	font-size: 20px;
 }
 
-
+#alien-stats{
+	height: 30%;
+	display: flex;
+	justify-content: space-between;
+	flex-direction: column;
+}
 
 
 /*LEVEL ONE*/
