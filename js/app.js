@@ -15,6 +15,7 @@ let alienShots;
 let shotsFired = [];
 let alienShotsFired = [];
 let animate;
+let wave = 1;
 
 // button to start the game
 $('#start').on('click', () => {
@@ -45,6 +46,10 @@ const theGame = {
 		for (let i = 1; i <= this.numOfAliens; i++) {
 			alienShipFactory.generateAlienShips(alienShipXPos, i);
 
+			if (this.level === 5) {
+				alienShipFactory.alienShips[i-1].hull = 20;
+			}
+
 			alienShipXPos += alienShipX
 
 			$('<div>').attr('id', alienShipFactory.alienShips[i-1].body.id.toString()).text("Ship " + alienShipFactory.alienShips[i-1].body.id + ": " + alienShipFactory.alienShips[i-1].hull).css({
@@ -59,11 +64,12 @@ const theGame = {
 		cancelAnimationFrame(animate);
 		$('canvas').attr('width', '800px');
 		$('canvas').attr('height', '800px');
-	
+		$('canvas').removeClass()
 		$('canvas').addClass('ocean')
 		$('#start').detach();
 
 		this.level = 1;
+		wave = 1;
 		
 		spaceship.initialize()
 		spaceship.drawBody()
@@ -79,6 +85,7 @@ const theGame = {
 			'padding': '2px',
 			'margin-bottom': '5px'
 		})
+		$('#player-stats').empty()
 		const text = $('<p>').attr('id', 'player-stats-text').addClass('stat-style').text("YOUR SHIP").css({'font-size': '20px', 'text-align': 'center'})
 		text.appendTo($('#player-stats'))
 		// $('#player-stats').text("Your Ship").addClass('stat-style')
@@ -132,6 +139,12 @@ const theGame = {
 			alienShots = window.setInterval(alienFire, 500)
 			this.newAliens(12)
 			$('#level').text("LEVEL FOUR")	
+		} else if (this.level === 5) {
+			$('canvas').removeClass('city');
+			$('canvas').addClass('space');
+			alienShots = window.setInterval(alienFire, 400);
+			this.newAliens(12)
+			$('#level').text("FINAL STAGE")
 		}
 		gamePlayAnimation();
 	},
@@ -159,7 +172,7 @@ const theGame = {
 		ctx.clearRect(0,0, canvas.width, canvas.height);
 		$('canvas').attr('width', '0');
 		$('canvas').attr('height', '0');
-		$('canvas').removeClass("ocean")
+		// $('canvas').removeClass("ocean")
 		const endScreen = $('<div>').attr("id", "end-screen")
 		const endSpan = $('<span>').text("YOU DEFEATED THE ALIENS")
 		endSpan.attr("id", "end-text")
@@ -167,7 +180,9 @@ const theGame = {
 		const playAgain = $('<div>').text("PLAY AGAIN").addClass("buttons")
 		playAgain.on('click', () =>{
 			endScreen.detach();
+			// $('#stats').empty()
 			this.startGame()
+
 		})
 		playAgain.appendTo(endScreen)
 		endScreen.appendTo($("#canvas-holder"));
@@ -254,9 +269,6 @@ const alienShipFactory = {
 }
 
 
-// when the user presses the spacebar, a shot is fired up
-// this should occur in the animate canvas function (which may need to take an argument of keypress)
-
 class Shot {
 	constructor(x, y, dy) {
 		this.x = x;
@@ -269,11 +281,17 @@ class Shot {
 		this.draw = function() {
 			ctx.beginPath();
 			ctx.arc(this.x, this.y, this.r, this.e, Math.PI * 2);
+			ctx.fillStyle = "green";
+			ctx.fill();
+			ctx.closePath();
+		}
+		this.drawAlienShot = function() {
+			ctx.beginPath();
+			ctx.arc(this.x, this.y, this.r, this.e, Math.PI * 2);
 			ctx.fillStyle = "red";
 			ctx.fill();
 			ctx.closePath();
 		}
-
 		this.update = function() {
 			if(this.y + this.dy > 0) {
 				this.y += this.dy;
@@ -289,7 +307,7 @@ class Shot {
 		this.updateAlien = function() {
 			if (this.y + this.dy < 800) {
 				this.y += this.dy;
-				this.draw();
+				this.drawAlienShot();
 				this.checkForShipCollision();
 			} else if (this.y >= 800) {
 				alienShotsFired.shift();
@@ -372,7 +390,15 @@ class Shot {
 					$('#ships-destroyed').text("Ships Destroyed: " + theGame.shipsDestroyed)
 	// 				// toggleModal2();
 					if (alienShipFactory.alienShips.length <= 0) {
-						theGame.nextLevel();
+						if (theGame.level < 5) {
+							theGame.nextLevel();
+						} else if (theGame.level === 5 && wave < 3) {
+							theGame.newAliens(12);
+							wave += 1;
+						} else if (wave === 3) {
+							theGame.winGame()
+						}
+						
 					} else {
 						return;
 					}

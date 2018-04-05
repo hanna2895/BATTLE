@@ -79,6 +79,8 @@ canvas {
 	border: 2px solid black;
 	padding: 2px;
 	margin-bottom: 5px;
+	margin-right: 0px;
+	margin-left: 0px;
 }
 
 #level {
@@ -128,9 +130,17 @@ canvas {
 /*LEVEL FOUR*/
 
 .city {
-	background: url(../img/City.jpg);
+	background: url(../img/City2.jpg);
 	background-size: cover;
 }
+
+/*LEVEL FIVE*/
+
+.space {
+	background: url(../img/Space.jpg);
+	background-size: cover;
+}
+
 
 /*stuff for modal*/
 
