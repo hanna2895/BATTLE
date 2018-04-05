@@ -13,7 +13,7 @@ Users should be able to target specific ships by moving below them and shooting 
 
 Each level will have a set number of ships. Once the user destroys all the ships, they will proceed to the next level, which will have more, harder-to-kill ships. 
 
-Once the user defeats all of the small ships, they will go to the final level and fight the alien MotherShip. 
+Once the user defeats all of the small ships, they will go to the final level and fight the waves of remaining alien ships. 
 
 If the user runs out of hull points before defeating all of the alien ships, the game is over and the user is taken to the game over screen. 
 

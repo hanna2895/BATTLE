@@ -1,6 +1,9 @@
 // STILL TO DO
 
-// make a boss level
+// keep score? aliens killed minus hp 
+// store high scores to local storate?
+// add shooting sounds
+
 
 
 
@@ -180,7 +183,6 @@ const theGame = {
 		const playAgain = $('<div>').text("PLAY AGAIN").addClass("buttons")
 		playAgain.on('click', () =>{
 			endScreen.detach();
-			// $('#stats').empty()
 			this.startGame()
 
 		})

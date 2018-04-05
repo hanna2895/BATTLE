@@ -111,20 +111,20 @@ canvas {
 /*LEVEL ONE*/
 
 .ocean {
-	background: url(../img/OceanAnim.png);
+	background: url(../img/Ocean2.jpeg);
 	background-size: cover;
 }
 
 /*LEVEL TWO*/
 
 .desert {
-	background: url(../img/Desert.png);
+	background: url(../img/Desert2.jpg);
 }
 
 /*LEVEL THREE*/
 
 .arctic {
-	background: url(../img/Arctic.jpg);
+	background: url(../img/Arctic2.jpg);
 }
 
 /*LEVEL FOUR*/
