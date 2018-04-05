@@ -74,8 +74,21 @@ canvas {
 	justify-content: space-between;
 }
 
+.stat-style {
+	background-color: goldenrod;
+	border: 2px solid black;
+	padding: 2px;
+	margin-bottom: 5px;
+}
+
 #level {
 	font-size: 20px;
+	text-align: center;
+	/*background-color: goldenrod;
+	border: 2px solid black;
+	padding: 2px;
+	margin-top: 2px;
+	margin-bottom: 5px;*/
 }
 
 #alien-stats{
@@ -83,7 +96,14 @@ canvas {
 	display: flex;
 	justify-content: space-between;
 	flex-direction: column;
+/*	background-color: goldenrod;*/
+	padding: 2px;
 }
+
+/*#game-stats, #player-stats {
+	background-color: goldenrod;
+	padding: 2px;
+}*/
 
 
 /*LEVEL ONE*/

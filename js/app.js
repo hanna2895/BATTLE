@@ -1,6 +1,6 @@
 // STILL TO DO
 
-// display alien stats
+// make a boss level
 
 
 
@@ -18,7 +18,6 @@ let animate;
 
 // button to start the game
 $('#start').on('click', () => {
-	// ctx.clearRect(0, 0, canvas.width, canvas.height);
 	$('#intro-screen').detach();
 	theGame.startGame();
 })
@@ -47,8 +46,13 @@ const theGame = {
 			alienShipFactory.generateAlienShips(alienShipXPos, i);
 
 			alienShipXPos += alienShipX
-			// alienShipFactory.alienShips[i].shipId = (i + 1)
-			$('<div>').attr('id', alienShipFactory.alienShips[i-1].body.id.toString()).text("Ship " + alienShipFactory.alienShips[i-1].body.id + ": " + alienShipFactory.alienShips[i-1].hull).appendTo($('#alien-stats'))
+
+			$('<div>').attr('id', alienShipFactory.alienShips[i-1].body.id.toString()).text("Ship " + alienShipFactory.alienShips[i-1].body.id + ": " + alienShipFactory.alienShips[i-1].hull).css({
+				'background-color': 'goldenrod',
+				'border': '3px solid black',
+				'padding': '3px',
+				'margin': '0'
+			}).appendTo($('#alien-stats'))
 		}
 	},
 	startGame() {
@@ -69,27 +73,16 @@ const theGame = {
 
 		this.newAliens(4)
 
-
-		// this.numOfAliens = getRandomInteger(5, 11)
-		// alienShipFactory.alienShips = [];
-
-		// const alienShipX = ((canvas.width - 100) / this.numOfAliens)
-		// let alienShipXPos = alienShipX;
-
-		// for (let i = 1; i <= this.numOfAliens; i++) {
-		// 	alienShipFactory.generateAlienShips(alienShipXPos, i);
-
-		// 	alienShipXPos += alienShipX
-		// 	// alienShipFactory.alienShips[i].shipId = (i + 1)
-		// 	$('<div>').attr('id', alienShipFactory.alienShips[i-1].body.id.toString()).text("Ship " + alienShipFactory.alienShips[i-1].body.id + ": " + alienShipFactory.alienShips[i-1].hull).appendTo($('#alien-stats'))
-		// }
-
-		
-
-		$('#level').text("LEVEL ONE")
-		// $('#player-stats').text("Your Ship:")
-		$('#player-stats').text("Your Ship")
-		const hp = $('<p>').attr('id', 'hull-points').text("Hull Points: " + spaceship.hull);
+		$('#level').text("LEVEL ONE").css({
+			'background-color': 'goldenrod',
+			'border': '2px solid black',
+			'padding': '2px',
+			'margin-bottom': '5px'
+		})
+		const text = $('<p>').attr('id', 'player-stats-text').addClass('stat-style').text("YOUR SHIP").css({'font-size': '20px', 'text-align': 'center'})
+		text.appendTo($('#player-stats'))
+		// $('#player-stats').text("Your Ship").addClass('stat-style')
+		const hp = $('<p>').attr('id', 'hull-points').text("Hull Points: " + spaceship.hull).css({'margin-bottom':'5px', 'margin-top': '2px'});
 		$('#player-stats').append(hp)
 		
 		$('#ships-destroyed').text("Ships Destroyed: " + this.shipsDestroyed)
@@ -111,12 +104,6 @@ const theGame = {
 		cont.on('click', () =>{
 			nextScreen.detach();
 			this.levelUp()
-			// if (this.level === 2) {
-			// 	this.levelTwo()
-			// } else if (this.level === 3) {
-			// 	this.levelThree()
-			// }
-			
 		})
 		cont.appendTo(nextScreen)
 		nextScreen.appendTo($("#canvas-holder"));
@@ -148,50 +135,6 @@ const theGame = {
 		}
 		gamePlayAnimation();
 	},
-
-	// levelTwo() {
-	// 	cancelAnimationFrame(animate);
-	// 	$('canvas').attr('width', '800');
-	// 	$('canvas').attr('height', '800');
-	// 	$('canvas').removeClass('ocean');
-	// 	$('canvas').addClass('desert');
-
-	// 	shotsFired = [];
-
-	// 	window.clearInterval(alienShots);
-	// 	alienShots = window.setInterval(alienFire, 800)
-
-	// 	this.newAliens(8)
-
-	// 	$('#level').text("LEVEL TWO")
-
-	// 	gamePlayAnimation();
-	// 	//stop animation
-	// 	// remove ocean class
-	// 	// add desert class
-	// 	// get aliens
-	// 	// get ship
-	// 	// display all the stuff (but some of it is the same)/
-	// 	// start the animation
-	// },
-	// levelThree(){
-	// 	cancelAnimationFrame(gamePlayAnimation);
-	// 	$('canvas').attr('width', '800');
-	// 	$('canvas').attr('height', '800');
-	// 	$('canvas').removeClass('desert');
-	// 	$('canvas').addClass('arctic');
-
-	// 	shotsFired = [];
-
-	// 	window.clearInterval(alienShots);
-	// 	alienShots = window.setInterval(alienFire, 600)
-
-	// 	this.newAliens(10)
-
-	// 	$('#level').text("LEVEL THREE")
-
-	// 	gamePlayAnimation();
-	// },
 	endGame() {
 		cancelAnimationFrame(animate);
 		ctx.clearRect(0,0, canvas.width, canvas.height);
