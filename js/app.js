@@ -19,6 +19,7 @@ let shotsFired = [];
 let alienShotsFired = [];
 let animate;
 let wave = 1;
+let score;
 
 // button to start the game
 $('#start').on('click', () => {
@@ -92,7 +93,8 @@ const theGame = {
 		const text = $('<p>').attr('id', 'player-stats-text').addClass('stat-style').text("YOUR SHIP").css({'font-size': '20px', 'text-align': 'center'})
 		text.appendTo($('#player-stats'))
 		// $('#player-stats').text("Your Ship").addClass('stat-style')
-		const hp = $('<p>').attr('id', 'hull-points').text("Hull Points: " + spaceship.hull).css({'margin-bottom':'5px', 'margin-top': '2px'});
+		const hp = $('<p>').attr('id', 'hull-points').text("Hull: " + spaceship.hull).css({'margin-bottom':'5px', 'margin-top': '2px'});
+		// const score = $('<p>').attr('id', 'score').text("Score: " + score)
 		$('#player-stats').append(hp)
 		
 		$('#ships-destroyed').text("Ships Destroyed: " + this.shipsDestroyed)
@@ -420,7 +422,7 @@ class Shot {
 				alienShotsFired.shift()
 				this.didYouHitShip = true;
 				spaceship.hull -= 1;
-				$('#hull-points').text("Hull points: " + spaceship.hull)
+				$('#hull-points').text("Hull: " + spaceship.hull)
 				// this.checkForShipDestruction()
 				}
 				if (spaceship.hull <= 0) {
@@ -461,7 +463,7 @@ function alienFire() {
 
 
 
-function gamePlayAnimation(e) {
+function gamePlayAnimation() {
 	ctx.clearRect(0,0, canvas.width, canvas.height);
 
 	animate = requestAnimationFrame(gamePlayAnimation);
@@ -513,6 +515,7 @@ $('html').keydown(function(e) {
 		const shot = new Shot(spaceship.body.x, spaceship.body.y + 40, -10);
 		shotsFired.push(shot)
 		shot.didYouHitAlien = false;
+		$('audio#laser')[0].play()
 	}
 	
 })
