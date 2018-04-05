@@ -19,7 +19,7 @@ let shotsFired = [];
 let alienShotsFired = [];
 let animate;
 let wave = 1;
-let score;
+let score = 0;
 
 // button to start the game
 $('#start').on('click', () => {
@@ -74,6 +74,7 @@ const theGame = {
 
 		this.level = 1;
 		wave = 1;
+		score = 0;
 		
 		spaceship.initialize()
 		spaceship.drawBody()
@@ -94,7 +95,8 @@ const theGame = {
 		text.appendTo($('#player-stats'))
 		// $('#player-stats').text("Your Ship").addClass('stat-style')
 		const hp = $('<p>').attr('id', 'hull-points').text("Hull: " + spaceship.hull).css({'margin-bottom':'5px', 'margin-top': '2px'});
-		// const score = $('<p>').attr('id', 'score').text("Score: " + score)
+		const playerScore = $('<p>').attr('id', 'score').text("Score: " + score)
+		playerScore.appendTo($('#score')).addClass('stat-style')
 		$('#player-stats').append(hp)
 		
 		$('#ships-destroyed').text("Ships Destroyed: " + this.shipsDestroyed)
@@ -107,11 +109,15 @@ const theGame = {
 		$('canvas').attr('width', '0');
 		$('canvas').attr('height', '0');
 		this.level += 1;
+		score += spaceship.hull;
+		$('#score').text("Score: " + score).addClass('stat-style');
 
 		const nextScreen = $('<div>').attr("id", "next-screen")
 		const nextSpan = $('<span>').text("STAGE CLEARED")
 		nextSpan.attr("id", "next-text")
 		nextSpan.appendTo(nextScreen)
+		const yourScore = $('<div>').text("Your Score: " + score).addClass('score')
+		yourScore.appendTo(nextScreen)
 		const cont = $('<div>').text("CONTINUE").addClass("buttons")
 		cont.on('click', () =>{
 			nextScreen.detach();
@@ -125,6 +131,7 @@ const theGame = {
 		$('canvas').attr('width', '800');
 		$('canvas').attr('height', '800');
 		window.clearInterval(alienShots);
+		
 		if (this.level === 2) {
 			$('canvas').removeClass('ocean');
 			$('canvas').addClass('desert');
@@ -159,11 +166,15 @@ const theGame = {
 		$('canvas').attr('width', '0');
 		$('canvas').attr('height', '0');
 		$('canvas').removeClass("ocean")
+		$('#stats').empty();
 		
 		const endScreen = $('<div>').attr("id", "end-screen")
 		const endSpan = $('<span>').text("GAME OVER")
 		endSpan.attr("id", "end-text")
 		endSpan.appendTo(endScreen)
+		score += spaceship.hull
+		const yourScore = $('<div>').text("YOUR SCORE: " + score).addClass("score");
+		yourScore.appendTo(endScreen)
 		const playAgain = $('<div>').text("PLAY AGAIN").addClass("buttons")
 		playAgain.on('click', () =>{
 			endScreen.detach();
@@ -177,11 +188,15 @@ const theGame = {
 		ctx.clearRect(0,0, canvas.width, canvas.height);
 		$('canvas').attr('width', '0');
 		$('canvas').attr('height', '0');
+		$('#stats').empty();
 		// $('canvas').removeClass("ocean")
 		const endScreen = $('<div>').attr("id", "end-screen")
 		const endSpan = $('<span>').text("YOU DEFEATED THE ALIENS")
 		endSpan.attr("id", "end-text")
 		endSpan.appendTo(endScreen)
+		score += spaceship.hull;
+		const yourScore = $('<div>').text("YOUR SCORE: " + score).addClass("score");
+		yourScore.appendTo(endScreen)
 		const playAgain = $('<div>').text("PLAY AGAIN").addClass("buttons")
 		playAgain.on('click', () =>{
 			endScreen.detach();
@@ -386,6 +401,8 @@ class Shot {
 					return;
 				} else if (alienShipFactory.alienShips[k].hull <= 0) {
 					theGame.shipsDestroyed += 1;
+					score += 10;
+					$('#score').text("Score: " + score).addClass('stat-style');
 					$('#' + alienShipFactory.alienShips[k].body.id.toString()).remove()
 	// 				// remove that alien ship from the array
 					alienShipFactory.alienShips.splice(k,1);
