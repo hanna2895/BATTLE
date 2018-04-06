@@ -26,6 +26,10 @@ body {
 	justify-content: space-around;
 }
 
+#end-screen {
+	height: 750px;
+}
+
 #title, #end-text, #next-text {
 	padding-top: 150px;
 	font-size: 180px;

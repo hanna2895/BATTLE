@@ -101,6 +101,7 @@ const theGame = {
 		
 		$('#ships-destroyed').text("Ships Destroyed: " + this.shipsDestroyed)
 		$('#ships-remaining').text("Ships Remaining: " + alienShipFactory.alienShips.length)
+
 		gamePlayAnimation();
 	},
 	nextLevel() {
@@ -197,13 +198,24 @@ const theGame = {
 		score += spaceship.hull;
 		const yourScore = $('<div>').text("YOUR SCORE: " + score).addClass("score");
 		yourScore.appendTo(endScreen)
+		
+		
+
 		const playAgain = $('<div>').text("PLAY AGAIN").addClass("buttons")
 		playAgain.on('click', () =>{
 			endScreen.detach();
 			this.startGame()
-
+		
 		})
 		playAgain.appendTo(endScreen)
+
+		if (score > localStorage.getItem("highscore")) {
+  			localStorage.setItem("highscore", score);
+		}
+
+		let highScore = $('<div>').text("HIGH SCORE: " + localStorage.getItem("highscore")).addClass('score')
+		highScore.appendTo(endScreen)
+
 		endScreen.appendTo($("#canvas-holder"));
 	}
 }
@@ -409,6 +421,7 @@ class Shot {
 					$('#ships-remaining').text("Ships Remaining: " + alienShipFactory.alienShips.length)
 	// 				// add it to ships destroyed array to track how many have been destroyed
 					$('#ships-destroyed').text("Ships Destroyed: " + theGame.shipsDestroyed)
+
 	// 				// toggleModal2();
 					if (alienShipFactory.alienShips.length <= 0) {
 						if (theGame.level < 5) {
@@ -418,6 +431,7 @@ class Shot {
 							wave += 1;
 						} else if (wave === 3) {
 							theGame.winGame()
+							console.log('win game is being called');
 						}
 						
 					} else {

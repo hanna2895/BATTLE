@@ -13,10 +13,17 @@ Users should be able to target specific ships by moving below them and shooting 
 
 Each level will have a set number of ships. Once the user destroys all the ships, they will proceed to the next level, which will have more, harder-to-kill ships. 
 
-Once the user defeats all of the small ships, they will go to the final level and fight the waves of remaining alien ships. 
+Once the user defeats all of the small ships on earth, they will go to the final level and fight the waves of remaining alien ships in space. 
 
 If the user runs out of hull points before defeating all of the alien ships, the game is over and the user is taken to the game over screen. 
 
 The user will have the option to click start over to reset the game. 
 
-Levels: ocean, desert, arctic, city, space
+
+
+
+This game was made using jQuery and HTML5 Canvas. 
+
+Future versions of this game will have dynamic alien ships that move and fly towards the user to make the game more fun and challenging. 
+
+A problem that I overcame in the process of creating this game was learning how to animate the Canvas in a way that 1. worked and 2. did not crash the browser window once I added in more than one moving piece. 
