@@ -1,5 +1,7 @@
 # BATTLE
 
+![space battle](images/BATTLE.jpg)
+
 
 Player must fight to defend the earth from invading aliens. 
 
@@ -24,6 +26,6 @@ The user will have the option to click start over to reset the game.
 
 This game was made using jQuery and HTML5 Canvas. 
 
-Future versions of this game will have dynamic alien ships that move and fly towards the user to make the game more fun and challenging. 
+Future versions of this game will have dynamic alien ships that move and fly towards the user to make the game more fun and challenging. There will be multiple different types of alien ships (some of which have special attacks or defenses). It will also have additional levels in new and exciting locations. There may also be a two-player option.
 
 A problem that I overcame in the process of creating this game was learning how to animate the Canvas in a way that 1. worked and 2. did not crash the browser window once I added in more than one moving piece. 
