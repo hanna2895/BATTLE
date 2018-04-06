@@ -1,7 +1,5 @@
 # BATTLE
 
-![space battle](images/BATTLE.png)
-
 
 Player must fight to defend the earth from invading aliens. 
 
