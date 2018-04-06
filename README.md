@@ -20,7 +20,7 @@ If the user runs out of hull points before defeating all of the alien ships, the
 The user will have the option to click start over to reset the game. 
 
 
-
+___
 
 This game was made using jQuery and HTML5 Canvas. 
 
